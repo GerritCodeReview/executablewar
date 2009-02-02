@@ -1,0 +1,107 @@
+executablewar
+=============
+
+This package can be overlaid into a WAR file to make it executable,
+automatically loading the WEB-INF/lib directory into the classpath
+and launching a different main class.
+
+Add the magic block to your Maven pom.xml, setting the value of
+`Executable-War-Package` to the package of your main classes.
+
+With this magic in place, users can execute your WAR file as
+a standard JAR, including the class name on the command line:
+
+====
+  java -jar your.war Action ...
+====
+
+At runtime the class `${Executable-War-Package}.${Action}` will be
+loaded dynamically from the WEB-INF/lib directory and its static
+main method will be invoked with all remaining arguments.
+
+Files under `WEB-INF/` may also be accessed by the built-in actions
+`--ls` (list files) and `--cat` (output content to standard out).
+This may be useful for user-level documentation to unpack resources
+packaged with the application.  The `WEB-INF`/ prefix is assumed by
+these actions, and should not be specified on the command line.
+
+
+pom.xml magic
+-------------
+
+====
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>ExecutableWarMain</mainClass>
+            </manifest>
+            <manifestEntries>
+              <Executable-War-Package>your.package.prefix</Executable-War-Package>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>make-executable</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>gerrit</groupId>
+                  <artifactId>executablewar</artifactId>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/executablewar</outputDirectory>
+                  <includes>**/*.class</includes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>fix-output</id>
+            <phase>process-classes</phase>
+            <configuration>
+              <tasks>
+                <property name="d" location="${basedir}/target/${project.name}-${project.version}"/>
+
+                <copy todir="${d}">
+                  <fileset dir="${basedir}/target/executablewar" includes="**/*"/>
+                </copy>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>gerrit</groupId>
+      <artifactId>executablewar</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+====
