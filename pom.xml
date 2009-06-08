@@ -21,7 +21,7 @@ limitations under the License.
   <groupId>gerrit</groupId>
   <artifactId>executablewar</artifactId>
   <packaging>jar</packaging>
-  <version>1.0</version>
+  <version>1.1</version>
   <name>executablewar</name>
   <description>Support for running code directly from WAR files</description>
   <url>http://android.git.kernel.org/?p=tools/executablewar.git</url>

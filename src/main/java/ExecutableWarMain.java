@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -166,7 +167,17 @@ public class ExecutableWarMain {
       return;
     }
 
-    main.invoke(null, new Object[] {argv});
+    final Object res;
+    if ((main.getModifiers() & Modifier.STATIC) == Modifier.STATIC) {
+      res = main.invoke(null, new Object[] {argv});
+    } else {
+      res = main.invoke(clazz.newInstance(), new Object[] {argv});
+    }
+    if (res instanceof Number) {
+      System.exit(((Number) res).intValue());
+    } else {
+      System.exit(0);
+    }
   }
 
   private static Attributes myManifest() throws IOException,
