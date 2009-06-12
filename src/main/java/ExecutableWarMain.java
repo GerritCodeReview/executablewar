@@ -127,14 +127,7 @@ public class ExecutableWarMain {
     final String[] argv = new String[origArgv.length - 1];
     System.arraycopy(origArgv, 1, argv, 0, argv.length);
 
-    final Attributes att = myManifest();
-    String pkg = att.getValue(EXECUTABLE_WAR_PACKAGE);
-    if (pkg == null) {
-      pkg = "";
-    } else {
-      pkg = pkg + ".";
-    }
-
+    String pkg = cmdPackage();
     Class<?> clazz;
     try {
       try {
@@ -178,6 +171,21 @@ public class ExecutableWarMain {
     } else {
       System.exit(0);
     }
+  }
+
+  private static String cmdPackage() throws IOException, MalformedURLException {
+    String pkg = System.getProperty(EXECUTABLE_WAR_PACKAGE);
+    if (pkg != null && !pkg.equals("")) {
+      return pkg + ".";
+    }
+
+    pkg = myManifest().getValue(EXECUTABLE_WAR_PACKAGE);
+    if (pkg == null) {
+      pkg = "";
+    } else {
+      pkg = pkg + ".";
+    }
+    return pkg;
   }
 
   private static Attributes myManifest() throws IOException,
@@ -237,7 +245,7 @@ public class ExecutableWarMain {
       throw new LinkageError("Cannot unpack libs from " + myURL);
     }
     if (paths.isEmpty()) {
-      throw new LinkageError("No files under WEB-INF/lib/");
+      return ExecutableWarMain.class.getClassLoader();
     }
     return new URLClassLoader(paths.toArray(new URL[paths.size()]));
   }
