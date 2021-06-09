@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92af8191_aaecd44b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1137480
+      },
+      "writtenOn": "2021-06-09T01:58:19Z",
+      "side": 1,
+      "message": "\u003e Change has been successfully merged into the git repository.\n\n",
+      "revId": "4bca2c4d02556f3e44ffe957cf2efea756a3a99d",
+      "serverId": "173816e5-2b9a-37c3-8a2e-48639d4f1153"
+    }
+  ]
+}
